@@ -41,6 +41,9 @@ pub trait BasicType: AnyType {
     fn fn_type(&self, param_types: &[BasicTypeEnum], is_var_args: bool) -> FunctionType {
         Type::new(self.as_type_ref()).fn_type(param_types, is_var_args)
     }
+
+    /// Create an array type from this `BasicType`.
+    fn array_type(&self, size: u32) -> ArrayType;
 }
 
 /// Represents an LLVM type that can have integer math operations applied to it.
@@ -70,7 +73,6 @@ pub trait PointerMathType: BasicType {
 }
 
 trait_type_set! {AnyType: AnyTypeEnum, BasicTypeEnum, IntType, FunctionType, FloatType, PointerType, StructType, ArrayType, VoidType, VectorType}
-trait_type_set! {BasicType: BasicTypeEnum, IntType, FloatType, PointerType, StructType, ArrayType, VectorType}
 
 impl IntMathType for IntType {
     type ValueType = IntValue;

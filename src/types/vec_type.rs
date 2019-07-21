@@ -4,7 +4,9 @@ use llvm_sys::prelude::{LLVMTypeRef, LLVMValueRef};
 use crate::AddressSpace;
 use crate::context::ContextRef;
 use crate::support::LLVMString;
-use crate::types::{ArrayType, BasicTypeEnum, Type, traits::AsTypeRef, FunctionType, PointerType};
+use crate::types::{ArrayType, BasicTypeEnum, Type,
+    traits::{AsTypeRef, BasicType},
+    FunctionType, PointerType};
 use crate::values::{AsValueRef, ArrayValue, BasicValue, VectorValue, IntValue};
 
 /// A `VectorType` is the type of a multiple value SIMD constant or variable.
@@ -234,25 +236,6 @@ impl VectorType {
         self.vec_type.fn_type(param_types, is_var_args)
     }
 
-    /// Creates an `ArrayType` with this `VectorType` for its element type.
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use inkwell::context::Context;
-    ///
-    /// let context = Context::create();
-    /// let f32_type = context.f32_type();
-    /// let f32_vec_type = f32_type.vec_type(3);
-    /// let f32_vec_array_type = f32_vec_type.array_type(3);
-    ///
-    /// assert_eq!(f32_vec_array_type.len(), 3);
-    /// assert_eq!(f32_vec_array_type.get_element_type().into_vector_type(), f32_vec_type);
-    /// ```
-    pub fn array_type(&self, size: u32) -> ArrayType {
-        self.vec_type.array_type(size)
-    }
-
     /// Creates a constant `ArrayValue`.
     ///
     /// # Example
@@ -302,5 +285,26 @@ impl VectorType {
 impl AsTypeRef for VectorType {
     fn as_type_ref(&self) -> LLVMTypeRef {
         self.vec_type.type_
+    }
+}
+
+impl BasicType for VectorType {
+    /// Creates an `ArrayType` with this `VectorType` for its element type.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use inkwell::context::Context;
+    ///
+    /// let context = Context::create();
+    /// let f32_type = context.f32_type();
+    /// let f32_vec_type = f32_type.vec_type(3);
+    /// let f32_vec_array_type = f32_vec_type.array_type(3);
+    ///
+    /// assert_eq!(f32_vec_array_type.len(), 3);
+    /// assert_eq!(f32_vec_array_type.get_element_type().into_vector_type(), f32_vec_type);
+    /// ```
+    fn array_type(&self, size: u32) -> ArrayType {
+        self.vec_type.array_type(size)
     }
 }

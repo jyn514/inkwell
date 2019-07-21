@@ -3,7 +3,7 @@ use llvm_sys::LLVMTypeKind;
 use llvm_sys::prelude::LLVMTypeRef;
 
 use crate::types::{IntType, VoidType, FunctionType, PointerType, VectorType, ArrayType, StructType, FloatType};
-use crate::types::traits::AsTypeRef;
+use crate::types::traits::{AsTypeRef, BasicType};
 
 macro_rules! enum_type_set {
     ($(#[$enum_attrs:meta])* $enum_name:ident: { $($(#[$variant_attrs:meta])* $args:ident,)+ }) => (
@@ -134,6 +134,24 @@ impl BasicTypeEnum {
             LLVMTypeKind::LLVMFunctionTypeKind => unreachable!("Unsupported basic type: FunctionType"),
             #[cfg(not(any(feature = "llvm3-6", feature = "llvm3-7")))]
             LLVMTypeKind::LLVMTokenTypeKind => unreachable!("Unsupported basic type: Token"),
+        }
+    }
+}
+
+impl BasicType for BasicTypeEnum {
+    fn as_basic_type_enum(&self) -> BasicTypeEnum {
+        *self
+    }
+
+    fn array_type(&self, size: u32) -> ArrayType {
+        use BasicTypeEnum::*;
+        match self {
+            ArrayType(a) => a.array_type(size),
+            FloatType(a) => a.array_type(size),
+            IntType(a) => a.array_type(size),
+            PointerType(a) => a.array_type(size),
+            StructType(a) => a.array_type(size),
+            VectorType(a) => a.array_type(size),
         }
     }
 }

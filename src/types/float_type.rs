@@ -5,7 +5,7 @@ use llvm_sys::prelude::{LLVMTypeRef, LLVMValueRef};
 use crate::AddressSpace;
 use crate::context::ContextRef;
 use crate::support::LLVMString;
-use crate::types::traits::AsTypeRef;
+use crate::types::traits::{AsTypeRef, BasicType};
 use crate::types::{Type, PointerType, FunctionType, BasicTypeEnum, ArrayType, VectorType};
 use crate::values::{AsValueRef, ArrayValue, FloatValue, GenericValue, IntValue};
 
@@ -37,24 +37,6 @@ impl FloatType {
     /// ```
     pub fn fn_type(&self, param_types: &[BasicTypeEnum], is_var_args: bool) -> FunctionType {
         self.float_type.fn_type(param_types, is_var_args)
-    }
-
-    /// Creates an `ArrayType` with this `FloatType` for its element type.
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use inkwell::context::Context;
-    ///
-    /// let context = Context::create();
-    /// let f32_type = context.f32_type();
-    /// let f32_array_type = f32_type.array_type(3);
-    ///
-    /// assert_eq!(f32_array_type.len(), 3);
-    /// assert_eq!(f32_array_type.get_element_type().into_float_type(), f32_type);
-    /// ```
-    pub fn array_type(&self, size: u32) -> ArrayType {
-        self.float_type.array_type(size)
     }
 
     /// Creates a `VectorType` with this `FloatType` for its element type.
@@ -425,5 +407,25 @@ impl FloatType {
 impl AsTypeRef for FloatType {
     fn as_type_ref(&self) -> LLVMTypeRef {
         self.float_type.type_
+    }
+}
+
+impl BasicType for FloatType {
+        /// Creates an `ArrayType` with this `FloatType` for its element type.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use inkwell::context::Context;
+    ///
+    /// let context = Context::create();
+    /// let f32_type = context.f32_type();
+    /// let f32_array_type = f32_type.array_type(3);
+    ///
+    /// assert_eq!(f32_array_type.len(), 3);
+    /// assert_eq!(f32_array_type.get_element_type().into_float_type(), f32_type);
+    /// ```
+    fn array_type(&self, size: u32) -> ArrayType {
+        self.float_type.array_type(size)
     }
 }

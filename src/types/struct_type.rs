@@ -9,8 +9,8 @@ use std::mem::forget;
 use crate::AddressSpace;
 use crate::context::ContextRef;
 use crate::support::LLVMString;
-use crate::types::traits::AsTypeRef;
-use crate::types::{Type, BasicTypeEnum, ArrayType, PointerType, FunctionType, VectorType};
+use crate::types::traits::{AsTypeRef, BasicType};
+use crate::types::{Type, BasicTypeEnum, ArrayType, PointerType, FunctionType};
 use crate::values::{ArrayValue, BasicValueEnum, StructValue, IntValue, AsValueRef};
 
 /// A `StructType` is the type of a heterogeneous container of types.
@@ -263,25 +263,6 @@ impl StructType {
         self.struct_type.fn_type(param_types, is_var_args)
     }
 
-    /// Creates an `ArrayType` with this `StructType` for its element type.
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use inkwell::context::Context;
-    ///
-    /// let context = Context::create();
-    /// let f32_type = context.f32_type();
-    /// let struct_type = context.struct_type(&[f32_type.into(), f32_type.into()], false);
-    /// let struct_array_type = struct_type.array_type(3);
-    ///
-    /// assert_eq!(struct_array_type.len(), 3);
-    /// assert_eq!(struct_array_type.get_element_type().into_struct_type(), struct_type);
-    /// ```
-    pub fn array_type(&self, size: u32) -> ArrayType {
-        self.struct_type.array_type(size)
-    }
-
     /// Determines whether or not a `StructType` is packed.
     ///
     /// # Example
@@ -489,5 +470,26 @@ impl StructType {
 impl AsTypeRef for StructType {
     fn as_type_ref(&self) -> LLVMTypeRef {
         self.struct_type.type_
+    }
+}
+
+impl BasicType for StructType {
+    /// Creates an `ArrayType` with this `StructType` for its element type.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use inkwell::context::Context;
+    ///
+    /// let context = Context::create();
+    /// let f32_type = context.f32_type();
+    /// let struct_type = context.struct_type(&[f32_type.into(), f32_type.into()], false);
+    /// let struct_array_type = struct_type.array_type(3);
+    ///
+    /// assert_eq!(struct_array_type.len(), 3);
+    /// assert_eq!(struct_array_type.get_element_type().into_struct_type(), struct_type);
+    /// ```
+    fn array_type(&self, size: u32) -> ArrayType {
+        self.struct_type.array_type(size)
     }
 }

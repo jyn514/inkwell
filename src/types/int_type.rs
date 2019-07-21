@@ -5,7 +5,7 @@ use llvm_sys::prelude::{LLVMTypeRef, LLVMValueRef};
 use crate::AddressSpace;
 use crate::context::ContextRef;
 use crate::support::LLVMString;
-use crate::types::traits::AsTypeRef;
+use crate::types::traits::{AsTypeRef, BasicType};
 use crate::types::{Type, ArrayType, BasicTypeEnum, VectorType, PointerType, FunctionType};
 use crate::values::{AsValueRef, ArrayValue, GenericValue, IntValue};
 
@@ -312,24 +312,6 @@ impl IntType {
         self.int_type.fn_type(param_types, is_var_args)
     }
 
-    /// Creates an `ArrayType` with this `IntType` for its element type.
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use inkwell::context::Context;
-    ///
-    /// let context = Context::create();
-    /// let i8_type = context.i8_type();
-    /// let i8_array_type = i8_type.array_type(3);
-    ///
-    /// assert_eq!(i8_array_type.len(), 3);
-    /// assert_eq!(i8_array_type.get_element_type().into_int_type(), i8_type);
-    /// ```
-    pub fn array_type(&self, size: u32) -> ArrayType {
-        self.int_type.array_type(size)
-    }
-
     /// Creates a `VectorType` with this `IntType` for its element type.
     ///
     /// # Example
@@ -513,5 +495,25 @@ impl IntType {
 impl AsTypeRef for IntType {
     fn as_type_ref(&self) -> LLVMTypeRef {
         self.int_type.type_
+    }
+}
+
+impl BasicType for IntType {
+    /// Creates an `ArrayType` with this `IntType` for its element type.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use inkwell::context::Context;
+    ///
+    /// let context = Context::create();
+    /// let i8_type = context.i8_type();
+    /// let i8_array_type = i8_type.array_type(3);
+    ///
+    /// assert_eq!(i8_array_type.len(), 3);
+    /// assert_eq!(i8_array_type.get_element_type().into_int_type(), i8_type);
+    /// ```
+    fn array_type(&self, size: u32) -> ArrayType {
+        self.int_type.array_type(size)
     }
 }

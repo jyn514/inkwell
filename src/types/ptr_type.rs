@@ -4,7 +4,7 @@ use llvm_sys::prelude::{LLVMTypeRef, LLVMValueRef};
 use crate::AddressSpace;
 use crate::context::ContextRef;
 use crate::support::LLVMString;
-use crate::types::traits::AsTypeRef;
+use crate::types::traits::{AsTypeRef, BasicType};
 use crate::types::{AnyTypeEnum, Type, BasicTypeEnum, ArrayType, FunctionType, VectorType};
 use crate::values::{AsValueRef, ArrayValue, PointerValue, IntValue};
 
@@ -129,26 +129,6 @@ impl PointerType {
     /// ```
     pub fn fn_type(&self, param_types: &[BasicTypeEnum], is_var_args: bool) -> FunctionType {
         self.ptr_type.fn_type(param_types, is_var_args)
-    }
-
-    /// Creates an `ArrayType` with this `PointerType` for its element type.
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use inkwell::context::Context;
-    /// use inkwell::AddressSpace;
-    ///
-    /// let context = Context::create();
-    /// let f32_type = context.f32_type();
-    /// let f32_ptr_type = f32_type.ptr_type(AddressSpace::Generic);
-    /// let f32_ptr_array_type = f32_ptr_type.array_type(3);
-    ///
-    /// assert_eq!(f32_ptr_array_type.len(), 3);
-    /// assert_eq!(f32_ptr_array_type.get_element_type().into_pointer_type(), f32_ptr_type);
-    /// ```
-    pub fn array_type(&self, size: u32) -> ArrayType {
-        self.ptr_type.array_type(size)
     }
 
     /// Gets the `AddressSpace` a `PointerType` was created with.
@@ -318,5 +298,27 @@ impl PointerType {
 impl AsTypeRef for PointerType {
     fn as_type_ref(&self) -> LLVMTypeRef {
         self.ptr_type.type_
+    }
+}
+
+impl BasicType for PointerType {
+    /// Creates an `ArrayType` with this `PointerType` for its element type.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use inkwell::context::Context;
+    /// use inkwell::AddressSpace;
+    ///
+    /// let context = Context::create();
+    /// let f32_type = context.f32_type();
+    /// let f32_ptr_type = f32_type.ptr_type(AddressSpace::Generic);
+    /// let f32_ptr_array_type = f32_ptr_type.array_type(3);
+    ///
+    /// assert_eq!(f32_ptr_array_type.len(), 3);
+    /// assert_eq!(f32_ptr_array_type.get_element_type().into_pointer_type(), f32_ptr_type);
+    /// ```
+    fn array_type(&self, size: u32) -> ArrayType {
+        self.ptr_type.array_type(size)
     }
 }
